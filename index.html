@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Jewellery Box — CEVI Assessment (Nikita)</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+
+  <style>
+    html,body { height:100%; margin:0; background:#0b0b0b; font-family:Inter, Arial, sans-serif; }
+    #ui {
+      position: absolute; top: 12px; left: 12px; right: 12px; z-index: 9999;
+      display:flex; justify-content:space-between; align-items:center; pointer-events:none;
+    }
+    #instructions {
+      pointer-events:auto;
+      background: rgba(255,255,255,0.06);
+      color:#fff; padding:10px 12px; border-radius:8px; font-size:13px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.6);
+    }
+    #closeBtn {
+      pointer-events:auto;
+      display:none;
+      background:#ffffff; color:#000; padding:8px 12px; border-radius:8px;
+      font-weight:700; cursor:pointer; margin-left:10px;
+      box-shadow: 0 8px 22px rgba(0,0,0,0.5);
+    }
+    footer { position: absolute; bottom: 8px; left: 12px; color: #999; font-size:12px; }
+  </style>
+
+  <!-- load components (must be in same folder) -->
+  <script src="components.js"></script>
+</head>
+<body>
+
+  <div id="ui">
+    <div id="instructions">Click a ring — it will pop forward. Drag horizontally to rotate (Y-only). Click Close to return.</div>
+    <div style="display:flex; align-items:center;">
+      <div id="closeBtn" role="button" aria-label="Close focused ring">Close</div>
+    </div>
+  </div>
+
+  <a-scene background="color: #111" embedded>
+
+    <!-- Lights: ambient + directional + point + hemisphere -> create specular highlights -->
+    <a-entity light="type: ambient; intensity: 0.45"></a-entity>
+    <a-entity light="type: directional; intensity: 1.6" position="3 6 4" rotation="-30 25 0"></a-entity>
+    <a-entity light="type: point; intensity: 1.2; distance: 18" position="-3 4 3"></a-entity>
+    <a-entity light="type: hemisphere; intensity: 0.12" position="0 5 0"></a-entity>
+
+    <!-- Camera rig -->
+    <a-entity id="cameraRig" position="0 1.85 6">
+      <a-entity camera look-controls="enabled: true"></a-entity>
+    </a-entity>
+
+    <!-- Jewellery box (pedestal) -->
+    <a-entity position="0 0 0">
+      <a-box position="0 0.6 0" depth="3.2" height="0.8" width="4"
+             material="color:#222; roughness:0.86; metalness:0.05"></a-box>
+      <a-plane rotation="-90 0 0" width="10" height="10" position="0 0 0"
+               material="color:#050505; roughness:1"></a-plane>
+    </a-entity>
+
+    <!-- Three distinct rings (torus primitives used as placeholders) -->
+    <a-entity id="ringsParent" position="0 0 0">
+
+      <!-- Ring 1: Gold tone -->
+      <a-entity id="ring1"
+                geometry="primitive: torus; radius: 0.55; tube: 0.12; segmentsTubular:64"
+                material="metalness:1; roughness:0.08; color:#FFD700"
+                position="-1.4 1.4 0"
+                rotation="0 0 0"
+                ring-focus
+                drag-rotate>
+      </a-entity>
+
+      <!-- Ring 2: Silver / lighter gold -->
+      <a-entity id="ring2"
+                geometry="primitive: torus; radius: 0.5; tube: 0.12; segmentsTubular:64"
+                material="metalness:1; roughness:0.06; color:#FFCC66"
+                position="0 1.4 0"
+                rotation="0 0 0"
+                ring-focus
+                drag-rotate>
+      </a-entity>
+
+      <!-- Ring 3: Rose gold tone -->
+      <a-entity id="ring3"
+                geometry="primitive: torus; radius: 0.52; tube: 0.12; segmentsTubular:64"
+                material="metalness:1; roughness:0.09; color:#E5A96A"
+                position="1.4 1.4 0"
+                rotation="0 0 0"
+                ring-focus
+                drag-rotate>
+      </a-entity>
+
+    </a-entity>
+
+  </a-scene>
+
+  <footer>Prepared for CEVI — Nikita</footer>
+
+  <script>
+    // wire the Close button to the global close event; prevent click propagation
+    const closeBtn = document.getElementById('closeBtn');
+    closeBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      // dispatch app-level close event
+      window.dispatchEvent(new CustomEvent('close-focused-ring', { bubbles: true }));
+    });
+
+    // show / hide from components (events)
+    window.addEventListener('show-close-button', () => { closeBtn.style.display = 'block'; });
+    window.addEventListener('hide-close-button', () => { closeBtn.style.display = 'none'; });
+  </script>
+</body>
+</html>
